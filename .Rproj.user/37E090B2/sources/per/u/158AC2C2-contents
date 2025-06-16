@@ -1,0 +1,241 @@
+df4HDplot <- function(obj, ano) {
+  
+  observed.tmp <- observed |> 
+    filter(year.s.first == ano) |> 
+    group_by(week, season, year.s.first, uf, macroregional, macroregional_geocode) |> 
+    summarise(cases = sum(cases, na.rm = TRUE)) 
+  
+  temp <- obj |> 
+    group_by(week, samples, uf, macrocode) |> 
+    summarise(values = sum(values)) |> 
+    ungroup() |> 
+    group_by(week, uf, macrocode) |> 
+    summarise(q50 = quantile(values, probs = 0.5), 
+              q75 = quantile(values, probs = 0.75), 
+              q90 = quantile(values, probs = 0.9),
+              q100 = Inf) 
+  
+  tmp1 <- temp |> 
+    pivot_longer(
+      cols = c(q50, q75, q90, q100),
+      names_to = 'quantile',
+      values_to = 'maxvalues'
+    )
+  
+  tmp2 <- temp |> 
+    mutate(q100 = q90,
+           q90 = q75,
+           q75 = q50,
+           q50 = 0) |> 
+    pivot_longer(
+      cols = c(q50, q75, q90, q100),
+      names_to = 'quantile',
+      values_to = 'minvalues'
+    )
+  
+  tmp <- tmp1 |> 
+    left_join(tmp2, by = c('week', 'uf', 'quantile', 'macrocode')) |> 
+    ungroup() |> 
+    left_join(observed.tmp, by = c('week', 'uf', 'macrocode' = 'macroregional_geocode')) |> 
+    mutate(epiweek = ifelse(week <= 12, yes = week + 40, no = week -12), 
+           epiyear = ifelse(week <= 12, yes = ano, no = ano + 1),
+           date = aweek::get_date(week = epiweek, year = epiyear,start = 7))
+  
+  tmp$quantile <- factor(tmp$quantile, 
+                         levels = c('q50','q75','q90','q100'),
+                         labels = c('Below the median,\ntypical','Moderately high,\nfairly typical',
+                                    'Fairly high,\natypical', 'Exceptionally high,\nvery atypical'))
+  return(tmp)
+}
+
+t1hd <- df4HDplot(df.prob.22_23, ano = 2022)
+t2hd <- df4HDplot(df.prob.23_24, ano = 2023)
+# t3hd <- df4HDplot(df.prob.24_25, ano = 2024)
+
+# df.prob.22_23 <- read_csv(file = "samples/macro.prob.22_23.csv.gz")
+# df.prob.23_24 <- read_csv(file = "samples/macro.prob.23_24.csv.gz")
+# df.prob.24_25 <- read_csv(file = "samples/macro.prob.24_25.csv.gz")
+
+df_macro_all <- df4HDplot(df.prob.22_23, ano = 2022) #|> filter(uf == input$uf_macro)
+
+
+plot_grafico_artigo_uf <- function(df, UF, palette) {
+  
+  quants <- rev(unique(df$quantile))
+  colors <- palette[seq_along(quants)]
+  
+  max_valor <- df |> filter(uf == UF, is.finite(df$maxvalues)) |> select(maxvalues, cases) |> max()
+  df_max_round <- ceiling(max_valor / 50) * 50
+  df_max_round2 <- df_max_round + (df_max_round * 0.1)
+  df2 <- df |> filter(uf == UF) |> mutate(maxvalues = ifelse(is.infinite(maxvalues), df_max_round2, maxvalues))
+  
+  fig <- plot_ly()
+  for(i in seq_along(quants)) {
+    fig <- fig |> add_trace(
+      data = df2 |> filter(quantile == quants[i]),
+      type = 'scatter', 
+      mode = 'lines',
+      x = ~date, 
+      y = ~maxvalues,
+      fill = 'tozeroy',
+      line = list(color = colors[i]),
+      fillcolor = colors[i],
+      name = quants[i],
+      hovertemplate = paste0("<b>", quants[i],"</b><extra></extra>")
+    )
+  }
+  
+  fig |>
+    add_trace(
+      data = df2,
+      type = 'scatter', mode = 'lines',
+      x = ~date, y = ~cases,
+      line = list(color = "black"),
+      name = "Cases",
+      hovertemplate = "<b>Cases</b>: %{y:,.0f}<extra></extra>"
+    ) |>
+    layout(
+      hovermode = "x unified",
+      xaxis = list(title = "Date", showgrid = FALSE, zeroline = FALSE),
+      yaxis = list(title = "Dengue cases", showgrid = FALSE, zeroline = FALSE),
+      legend = list(itemclick = FALSE, itemdoubleclick = FALSE)
+    )
+}
+
+
+
+
+
+# ---------------------------------------------------------------------------------------------
+
+
+# gera gráfico com split por macroregional
+df_macro_all <- df4HDplot(df.prob.22_23, ano = 2022)
+
+t1hd <- df_macro_all |> filter(uf == "AL")
+
+###
+
+library(plotly)
+library(dplyr)
+
+library(plotly)
+library(dplyr)
+
+plot_macro_subplots <- function(df, palette, uf_name) {
+  # 1) filtra só a UF desejada
+  df_uf <- df %>% filter(uf == uf_name)
+  
+  # 2) extrai as macrorregiões e conta quantas são
+  regs  <- sort(unique(df_uf$macroregional))
+  n_regs <- length(regs)
+  if(n_regs == 0) stop("nenhuma macrorregião encontrada para ", uf_name)
+  
+  # 3) pré-aloca a lista de plots
+  plots <- vector("list", n_regs)
+  
+  for (i in seq_along(regs)) {
+    reg <- regs[i]
+    col <- palette[(i - 1) %% length(palette) + 1]
+    
+    plots[[i]] <- plot_ly(
+      data = t1hd %>% filter(macroregional == regs[i]),
+      x    = ~date, 
+      y    = ~cases,
+      type = 'scatter', 
+      mode = 'lines',
+      line = list(color = col),
+      name = reg,
+      hovertemplate = paste0(
+        "<b>", reg, "</b><br>",
+        "Cases: %{y:,.0f}",
+        "<extra></extra>"
+      )
+    ) %>% layout(
+      title = reg,
+      xaxis = list(showgrid = FALSE, zeroline = FALSE, title = NULL),
+      yaxis = list(showgrid = FALSE, zeroline = FALSE, title = NULL)
+    )
+  }
+  
+  # 4) define quantas colunas e linhas quer no grid
+  ncol <- ceiling(sqrt(n_regs))
+  nrow <- ceiling(n_regs / ncol)
+  
+  # 5) monta o subplot usando plotlist=
+  subplot(
+    plotlist = plots,
+    nrows    = nrow,
+    margin   = 0.02,
+    shareX   = TRUE,
+    shareY   = TRUE,
+    titleX   = TRUE,
+    titleY   = TRUE
+  ) %>% layout(
+    hovermode  = "x unified",
+    showlegend = FALSE
+  )
+}
+
+plot_macro_subplots(t1hd, pal2, "AC")
+  
+###
+
+
+quants <- rev(unique(df$quantile))
+colors <- palette[seq_along(quants)]
+
+max_valor <- t1hd |> filter(is.finite(maxvalues)) |> select(maxvalues, cases) |> max()
+df_max_round <- ceiling(max_valor / 50) * 50
+df_max_round2 <- df_max_round + (df_max_round * 0.1)
+t1hd2 <- t1hd |> mutate(maxvalues = ifelse(is.infinite(maxvalues), df_max_round2, maxvalues))
+
+macros <- sort(unique(t1hd2$macroregional))
+
+plot_ly(
+  data = t1hd |> filter(macroregional == macros[1]),
+  x = ~date,
+  y = ~maxvalues,
+  # split = ~macroregional,
+  type = 'scatter',
+  mode = 'lines',
+  fill = 'tozeroy',
+  # color = ~macroregional,
+  colors = pal2,
+  # text = ~macroregional,
+  hovertemplate = '<b>%{text}</b><extra></extra>'
+)
+
+
+
+###
+
+plot_ly(
+  data = df_macro_all,
+  x = ~date,
+  y = ~maxvalues,
+  split = ~macroregional,
+  type = 'scatter',
+  mode = 'lines',
+  fill = 'tozeroy',
+  color = ~macroregional,
+  colors = pal2,
+  text = ~macroregional,
+  hovertemplate = '<b>%{text}</b><extra></extra>'
+) %>% add_trace(
+  data = df_macro_all,
+  x = ~date,
+  y = ~cases,
+  type = 'scatter',
+  mode = 'lines',
+  line = list(color = 'black'),
+  name = 'Cases',
+  hovertemplate = '<b>Cases</b>: %{y:,.0f}<extra></extra>'
+) %>% layout(
+  hovermode = 'x unified',
+  xaxis = list(title = 'Date', showgrid = FALSE, zeroline = FALSE),
+  yaxis = list(title = paste('Dengue cases —'), showgrid = FALSE, zeroline = FALSE),
+  legend = list(itemclick = FALSE, itemdoubleclick = FALSE)
+)
+
+

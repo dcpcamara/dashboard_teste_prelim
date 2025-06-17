@@ -10,7 +10,7 @@ library(MetBrewer)
 
 # Auxiliary functions -------------------------------------------------------------------------
 
-source("aux_fun.r")
+# source("aux_fun.r")
 source("data_fun.r")
 source("graf_fun.r")
 
@@ -25,19 +25,19 @@ pal2 <- c(met.brewer('Hiroshige', 7)[1], pal)
 
 df.prob.22_23 <- read_csv(file = "samples/macro.prob.22_23.csv.gz")
 df.prob.23_24 <- read_csv(file = "samples/macro.prob.23_24.csv.gz")
-df.prob.24_25 <- read_csv(file = "samples/macro.prob.24_25.csv.gz")
+# df.prob.24_25 <- read_csv(file = "samples/macro.prob.24_25.csv.gz")
 
 
 # Datasets for Brazil, UFs and Health Regions -------------------------------------------------
 
-t1br <- df4BRplot(df.prob.22_23, ano = 2022)
-t2br <- df4BRplot(df.prob.23_24, ano = 2023)
+t1br <- vroom::vroom("data/t1br.csv.gz")
+t2br <- vroom::vroom("data/t2br.csv.gz")
 
-t1uf <- df4UFplot(df.prob.22_23, ano = 2022)
-t2uf <- df4UFplot(df.prob.23_24, ano = 2023)
+t1uf <- vroom::vroom("data/t1uf.csv.gz")
+t2uf <- vroom::vroom("data/t2uf.csv.gz")
 
-t1hd <- df4HDplot(df.prob.22_23, ano = 2022)
-t2hd <- df4HDplot(df.prob.23_24, ano = 2023)
+t1hd <- vroom::vroom("data/t1hd.csv.gz")
+t2hd <- vroom::vroom("data/t2hd.csv.gz")
 
 
 # UI ------------------------------------------------------------------------------------------
@@ -62,8 +62,8 @@ ui <- fluidPage(
              selectInput(
                inputId = "uf", 
                label = "Escolha a UF:", 
-               choices = sort(unique(dengue.df$uf)), 
-               selected = sort(unique(dengue.df$uf))[1]
+               choices = sort(unique(observed$uf)), 
+               selected = sort(unique(observed$uf))[1]
              ),
              fluidRow(
                column(width = 6,
@@ -79,8 +79,8 @@ ui <- fluidPage(
              selectInput(
                inputId = "uf_macro",
                label   = "Escolha a UF:",
-               choices = sort(unique(dengue.df$uf)),
-               selected = sort(unique(dengue.df$uf))[1]
+               choices = sort(unique(observed$uf)),
+               selected = sort(unique(observed$uf))[1]
              ),
              plotlyOutput("plotMacro", height = "600px")
     )

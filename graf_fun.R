@@ -12,18 +12,19 @@ plot_grafico_artigo <- function(df, palette) {
   
   fig <- plot_ly()
   for(i in seq_along(quants)) {
-    fig <- fig |> add_trace(
-      data = df2 |> filter(quantile == quants[i]),
-      type = 'scatter', 
-      mode = 'lines',
-      x = ~date, 
-      y = ~maxvalues,
-      fill = 'tozeroy',
-      line = list(color = colors[i]),
-      fillcolor = colors[i],
-      name = quants[i],
-      hovertemplate = paste0("<b>", quants[i],"</b>: %{y:,.0f}<extra></extra>")
-    )
+    fig <- fig |> 
+      add_trace(
+        data = df2 |> filter(quantile == quants[i]),
+        type = 'scatter', 
+        mode = 'lines',
+        x = ~date, 
+        y = ~maxvalues,
+        fill = 'tozeroy',
+        line = list(color = colors[i]),
+        fillcolor = colors[i],
+        name = quants[i],
+        hovertemplate = paste0("<b>", quants[i],"</b>: %{y:,.0f}<extra></extra>")
+      )
   }
   
   fig |>
@@ -58,18 +59,19 @@ plot_grafico_artigo_uf <- function(df, UF, palette) {
   
   fig <- plot_ly()
   for(i in seq_along(quants)) {
-    fig <- fig |> add_trace(
-      data = df2 |> filter(quantile == quants[i]),
-      type = 'scatter', 
-      mode = 'lines',
-      x = ~date, 
-      y = ~maxvalues,
-      fill = 'tozeroy',
-      line = list(color = colors[i]),
-      fillcolor = colors[i],
-      name = quants[i],
-      hovertemplate = paste0("<b>", quants[i],"</b>: %{y:,.0f}<extra></extra>")
-    )
+    fig <- fig |> 
+      add_trace(
+        data = df2 |> filter(quantile == quants[i]),
+        type = 'scatter', 
+        mode = 'lines',
+        x = ~date, 
+        y = ~maxvalues,
+        fill = 'tozeroy',
+        line = list(color = colors[i]),
+        fillcolor = colors[i],
+        name = quants[i],
+        hovertemplate = paste0("<b>", quants[i],"</b>: %{y:,.0f}<extra></extra>")
+      )
   }
   
   fig |>
@@ -93,8 +95,8 @@ plot_grafico_artigo_uf <- function(df, UF, palette) {
 # Plotly for HD -------------------------------------------------------------------------------
 
 plot_grafico_artigo_macro_por_uf <- function(df, UF, palette) {
-
-    df_uf <- df |> filter(uf == UF)
+  
+  df_uf <- df |> filter(uf == UF)
   regs <- sort(unique(df_uf$macroregional))
   n_regs <- length(regs)
   if(n_regs == 0) stop("Nenhuma macrorregião encontrada para ", UF)
@@ -118,18 +120,19 @@ plot_grafico_artigo_macro_por_uf <- function(df, UF, palette) {
     
     fig_i <- plot_ly()
     for (i in seq_along(quants)) {
-      fig_i <- fig_i |> add_trace(
-        data = df2 |> filter(quantile == quants[i]),
-        type = 'scatter',
-        mode = 'lines',
-        x = ~date,
-        y = ~maxvalues,
-        fill = 'tozeroy',
-        line = list(color = colors[i]),
-        fillcolor = colors[i],
-        name = quants[i],
-        hovertemplate = paste0("<b>", quants[i],"</b>: %{y:,.0f}<extra></extra>")
-      )
+      fig_i <- fig_i |> 
+        add_trace(
+          data = df2 |> filter(quantile == quants[i]),
+          type = 'scatter',
+          mode = 'lines',
+          x = ~date,
+          y = ~maxvalues,
+          fill = 'tozeroy',
+          line = list(color = colors[i]),
+          fillcolor = colors[i],
+          name = quants[i],
+          hovertemplate = paste0("<b>", quants[i],"</b>: %{y:,.0f}<extra></extra>")
+        )
     }
     fig_i <- fig_i |>
       add_trace(

@@ -1,17 +1,12 @@
 library(shiny)
 library(tidyverse)
 library(plotly)
-library(sf)
-library(geobr)
-library(aweek)
 library(vroom)
 library(MetBrewer)
 
 
 # Auxiliary functions -------------------------------------------------------------------------
 
-# source("aux_fun.r")
-source("data_fun.r")
 source("graf_fun.r")
 
 
@@ -23,9 +18,9 @@ pal2 <- c(met.brewer('Hiroshige', 7)[1], pal)
 
 # Reading data --------------------------------------------------------------------------------
 
+observed <- vroom::vroom("data/observed.csv.gz")
 df.prob.22_23 <- read_csv(file = "samples/macro.prob.22_23.csv.gz")
 df.prob.23_24 <- read_csv(file = "samples/macro.prob.23_24.csv.gz")
-# df.prob.24_25 <- read_csv(file = "samples/macro.prob.24_25.csv.gz")
 
 
 # Datasets for Brazil, UFs and Health Regions -------------------------------------------------

@@ -1,0 +1,12 @@
+name: freitas2025_teste_prelim
+title: freitas2025_teste_prelim
+username: danielcamara
+account: danielcamara
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 14950612
+bundleId:
+url: https://danielcamara.shinyapps.io/freitas2025_teste_prelim/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

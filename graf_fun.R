@@ -1,3 +1,6 @@
+library(tidyverse)
+library(plotly)
+
 # Plotly for Country --------------------------------------------------------------------------
 
 plot_grafico_artigo <- function(df, palette) {
@@ -170,6 +173,7 @@ plot_grafico_artigo_macro_por_uf <- function(df, UF, palette) {
   
   title_hd <- vector("list", n_regs)
   for (i in seq_along(regs)) {
+    
     coli <- (i-1) %% ncol
     rowi <- floor((i-1) / ncol)
     x0 <- coli / ncol
@@ -190,8 +194,9 @@ plot_grafico_artigo_macro_por_uf <- function(df, UF, palette) {
     )
   }
   
-  p |> layout(
-    hovermode = "x unified",
-    annotations = title_hd
-  )
+  p |> 
+    layout(
+      hovermode = "x unified",
+      annotations = title_hd
+    )
 }

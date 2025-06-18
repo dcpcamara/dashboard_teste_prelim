@@ -316,7 +316,7 @@ ui <- fluidPage(
     "Available on ",
     tags$a(
       "https://doi.org/10.1101/2025.06.12.25329525",
-      href   = "https://doi.org/10.1101/2025.06.12.25329525",
+      href = "https://doi.org/10.1101/2025.06.12.25329525",
       target = "_blank"
     )
   ),
@@ -390,8 +390,8 @@ ui <- fluidPage(
              )
     ),
     
-    # 4) Macrorregião
-    tabPanel("Macrorregião",
+    # 4) Health Districts
+    tabPanel("Health Districts",
              sidebarLayout(
                sidebarPanel(
                  width = 3,
@@ -561,9 +561,8 @@ server <- function(input, output, session) {
         )
       )
   })
-  
-  
 }
+
 
 
 # RUN APP -------------------------------------------------------------------------------------

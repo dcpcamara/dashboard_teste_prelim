@@ -6,6 +6,7 @@ library(plotly)
 library(rio)
 library(MetBrewer)
 library(leaflet)
+library(sf)
 
 
 # Auxiliary functions -------------------------------------------------------------------------
@@ -246,6 +247,9 @@ observed <- import("data/observed.csv.gz")
 df.prob.22_23 <- import(file = "samples/macro.prob.22_23.csv.gz")
 df.prob.23_24 <- import(file = "samples/macro.prob.23_24.csv.gz")
 df.prob.24_25 <- import(file = "samples/macro.prob.24_25.csv.gz")
+shape <- read_sf("data/shape_macro_simp.gpkg")
+ufshape <- read_sf("data/shape_uf_simp.gpkg")
+uf_labels <- readRDS("data/uf_labels.rds")
 
 
 # Datasets for Brazil, UFs and Health Regions -------------------------------------------------
@@ -284,6 +288,7 @@ region_colors <- c(
 
 # pal <- met.brewer('Hiroshige', 5)[1:3]
 # pal2 <- c(met.brewer('Hiroshige', 7)[1], pal)
+pal <- colorFactor(palette = region_colors, domain = shape$region_en)
 pal3 <- c("#EE9188","#F4AD7F","#F9D894","#C4E7E9")
 
 
@@ -462,12 +467,6 @@ server <- function(input, output, session) {
   })
   
   output$mapInsertUF <- renderLeaflet({
-    shape <- readRDS("data/shape_macro_simp.rds")
-    ufshape <- readRDS("data/shape_uf_simp.rds")
-    uf_labels <- readRDS("data/uf_labels.rds")
-    
-    pal <- colorFactor(palette = region_colors, domain = shape$region_en)
-    
     leaflet() |>
       addProviderTiles(providers$CartoDB.Positron) |>
       addPolygons(data = shape,
@@ -525,12 +524,6 @@ server <- function(input, output, session) {
   })
   
   output$mapInsertMacro <- renderLeaflet({
-    shape <- readRDS("data/shape_macro_simp.rds")
-    ufshape <- readRDS("data/shape_uf_simp.rds")
-    uf_labels <- readRDS("data/uf_labels.rds")
-
-    pal <- colorFactor(palette = region_colors, domain = shape$region_en)
-    
     leaflet() |>
       addProviderTiles(providers$CartoDB.Positron) |>
       addPolygons(

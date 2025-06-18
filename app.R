@@ -309,12 +309,7 @@ ui <- fluidPage(
   titlePanel("A statistical model for forecasting probabilistic epidemic bands for dengue cases in Brazil"),
   
   tags$h5(
-    "Available on ",
-    tags$a(
-      "https://doi.org/10.1101/2025.06.12.25329525",
-      href = "https://doi.org/10.1101/2025.06.12.25329525",
-      target = "_blank"
-    )
+    "Currently under peer-review process",
   ),
   
   tabsetPanel(

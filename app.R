@@ -341,7 +341,7 @@ ui <- fluidPage(
              tags$p(tags$sup("4"), "Graduate Program in Epidemiology in Public Health, Sergio Arouca National School of Public Health, Oswaldo Cruz Foundation, Rio de Janeiro, RJ, Brazil"),
              tags$p(tags$sup("5"), "Applied Mathematics School, Getulio Vargas Foundation, Rio de Janeiro, RJ, Brazil"),
              tags$p(
-               "Available on ",
+               "Available as a pre-print on ",
                tags$a(
                  href = "https://doi.org/10.1101/2025.06.12.25329525",
                  target = "_blank",

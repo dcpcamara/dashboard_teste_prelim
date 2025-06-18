@@ -218,22 +218,22 @@ message_hover <- function(df){
   df |> 
     mutate(
       message = case_when(
-        quantile == "Below the median,\ntypical" ~ paste0("<", format(round(maxvalues), 
+        quantile == "Below the median,\ntypical" ~ paste0("<=", format(round(maxvalues), 
                                                                       nsmall=0, 
                                                                       big.mark=",")),
-        quantile == "Moderately high,\nfairly typical" ~ paste0(">=", format(round(minvalues), 
+        quantile == "Moderately high,\nfairly typical" ~ paste0(">", format(round(minvalues), 
                                                                              nsmall=0, 
                                                                              big.mark=","),
-                                                                " and <", format(round(maxvalues), 
+                                                                " and <=", format(round(maxvalues), 
                                                                                  nsmall=0, 
                                                                                  big.mark=",")),
-        quantile == "Fairly high,\natypical" ~ paste0(">=", format(round(minvalues), 
+        quantile == "Fairly high,\natypical" ~ paste0(">", format(round(minvalues), 
                                                                    nsmall=0, 
                                                                    big.mark=","),
-                                                      " and <", format(round(maxvalues), 
+                                                      " and <=", format(round(maxvalues), 
                                                                        nsmall=0, 
                                                                        big.mark=",")),
-        quantile == "Exceptionally high,\nvery atypical" ~ paste0(">=", format(round(minvalues), 
+        quantile == "Exceptionally high,\nvery atypical" ~ paste0(">", format(round(minvalues), 
                                                                                nsmall=0, 
                                                                                big.mark=","))
       )
@@ -341,7 +341,7 @@ ui <- fluidPage(
              tags$p(tags$sup("4"), "Graduate Program in Epidemiology in Public Health, Sergio Arouca National School of Public Health, Oswaldo Cruz Foundation, Rio de Janeiro, RJ, Brazil"),
              tags$p(tags$sup("5"), "Applied Mathematics School, Getulio Vargas Foundation, Rio de Janeiro, RJ, Brazil"),
              tags$p(
-               "Available as a pre-print on ",
+               "Available as a pre-print at ",
                tags$a(
                  href = "https://doi.org/10.1101/2025.06.12.25329525",
                  target = "_blank",

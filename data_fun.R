@@ -217,19 +217,22 @@ observed <- vroom::vroom("data/observed.csv.gz")
 
 # Maps ----------------------------------------------------------------------------------------
 
-# shape <- read_sf('data/shapefile_macro.json') |> 
-#   left_join(spatial.tbl |> 
-#               select(uf, macroregional, macroregional_geocode) |> 
-#               unique() |> 
+# spatial.tbl <- import("data/spatial.tbl.csv")
+# 
+# shape <- read_sf('data/shapefile_macro.json') |>
+#   left_join(spatial.tbl |>
+#               select(uf, macroregional, macroregional_geocode) |>
+#               unique() |>
 #               rename(uf_name = uf), by = c('code_macro' = 'macroregional_geocode'))
 # 
 # ufshape <- read_state(
-#   year = 2020, 
-#   showProgress = FALSE
+#   year = 2020,
+#   showProgress = FALSE,
+#   simplified = TRUE
 # )
 # 
-# ufshape <- ufshape |> 
-#   st_crop(xmin = -73.9904, ymin = -33.7511, xmax = -33.2476, ymax = 5.2718) 
+# ufshape <- ufshape |>
+#   st_crop(xmin = -73.9904, ymin = -33.7511, xmax = -33.2476, ymax = 5.2718)
 # 
 # ufshape <- st_transform(ufshape, st_crs(shape))
 # 
@@ -238,14 +241,14 @@ observed <- vroom::vroom("data/observed.csv.gz")
 #   region_en = c("North", "Northeast", "Southeast", "South", "Mid-West")
 # )
 # 
-# ufshape <- ufshape |> 
-#   left_join(regions_en, by = "name_region") |> 
+# ufshape <- ufshape |>
+#   left_join(regions_en, by = "name_region") |>
 #   mutate(name_state = if_else(name_state == 'Amazônas', true = 'Amazonas', false = name_state))
 # 
-# shape <- shape |> 
-#   left_join(ufshape |> 
-#               st_drop_geometry() |> 
-#               select(code_state, region_en), by = c('uf' = 'code_state')) 
+# shape <- shape |>
+#   left_join(ufshape |>
+#               st_drop_geometry() |>
+#               select(code_state, region_en), by = c('uf' = 'code_state'))
 # 
 # # Paleta de cores semelhante à do seu mapa
 # region_colors <- c(
@@ -262,10 +265,22 @@ observed <- vroom::vroom("data/observed.csv.gz")
 #   mutate(centroid = st_centroid(geom)) |>
 #   st_drop_geometry() |>
 #   bind_cols(st_coordinates(st_centroid(ufshape))) |>
-#   select(name_state, abbrev_state, X, Y)  
+#   select(name_state, abbrev_state, X, Y)
 # 
 # st_write(obj = shape, dsn = "data/gpkg_macro.gpkg", layer = "macro_shapes", driver = "GPKG", delete_dsn = TRUE)
 # st_write(obj = ufshape, dsn = "data/gpkg_uf.gpkg", layer = "uf_shapes", driver = "GPKG", delete_dsn = TRUE)
+# 
+# shape <- read_sf("data/gpkg_macro.gpkg")
+# ufshape <- read_sf("data/gpkg_uf.gpkg")
+# 
+# shape_simples <- ms_simplify(shape, keep = 0.05, keep_shapes = TRUE)
+# st_write(obj = shape_simples, dsn = "data/shape_macro_simp.gpkg", layer = "macro_shapes", driver = "GPKG", delete_dsn = TRUE)
+# 
+# ufshape_simples <- ms_simplify(ufshape, keep = 0.05, keep_shapes = TRUE)
+# st_write(obj = ufshape_simples, dsn = "data/shape_uf_simp.gpkg", layer = "macro_shapes", driver = "GPKG", delete_dsn = TRUE)
 
-shape <- read_sf("data/gpkg_macro.gpkg")
-ufshape <- read_sf("data/gpkg_uf.gpkg")
+write_rds(shape, "data/shape_macro_simp.rds")
+write_rds(ufshape, "data/shape_uf_simp.rds")
+
+# shape <- read_sf("data/shape_macro_simp.gpkg")
+# ufshape <- read_sf("data/shape_uf_simp.gpkg")
